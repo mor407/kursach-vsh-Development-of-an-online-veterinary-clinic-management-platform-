@@ -1,0 +1,18 @@
+{
+  "name": "vetclinic-prototype-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Минимальный API для демо главной (логин, /me, список записей).",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
