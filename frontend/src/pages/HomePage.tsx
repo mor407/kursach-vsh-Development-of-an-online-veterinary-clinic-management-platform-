@@ -5,6 +5,7 @@ import { fetchApi } from "../lib/api";
 import { getToken } from "../lib/authStorage";
 import type { Appointment } from "../types/appointment";
 import type { MeUser } from "../types/user";
+import "../styles/pages/home.css";
 
 /** Герой-баннер: файл из public/images/ */
 const HERO_IMAGE = "/images/home-hero-banner.png";

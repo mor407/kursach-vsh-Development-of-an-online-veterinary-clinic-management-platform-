@@ -173,6 +173,13 @@ export function SiteHeader({ me, onLogout }: SiteHeaderProps) {
           <span className="brand-name">ВетКлиника Online</span>
         </Link>
 
+        <div className="header-info" aria-label="Короткая информация по клинике">
+          <span className="header-info-item">Сегодня работаем до 21:00</span>
+          <Link className="header-info-item header-info-link" to="/contacts">
+            Экстренная связь 24/7
+          </Link>
+        </div>
+
         <nav id="site-nav" className="nav nav-main" aria-label="Основная навигация">
           {navGroups.map((group) => (
             <NavGroupBlock

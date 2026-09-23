@@ -4,6 +4,11 @@ export type MeUser = {
   fullName: string;
   phone: string | null;
   role: { id: number; name: string };
+  veterinarian: {
+    id: number;
+    specialization: string;
+    licenseNumber: string | null;
+  } | null;
 };
 
 /** Ответ GET /api/users (только админ). */

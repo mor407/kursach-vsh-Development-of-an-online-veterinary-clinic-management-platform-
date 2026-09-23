@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Environment (secrets)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Temp / local junk
+docx_extracted.txt
+*.tmp
+
+# CJM screenshots (generate locally: node scripts/capture-cjm-screenshots.mjs)
+cjm/screenshots/*
+!cjm/screenshots/.gitkeep

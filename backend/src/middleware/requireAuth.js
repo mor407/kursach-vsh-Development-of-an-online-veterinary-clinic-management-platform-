@@ -1,8 +1,10 @@
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config");
+
+const JWT_SECRET = process.env.JWT_SECRET || "dev-only-change-in-production";
 
 /**
- * Authorization: Bearer <jwt> → req.user = { id, roleId, role }
+ * Проверяет заголовок Authorization: Bearer <jwt>
+ * После успеха: req.user = { id, roleId, role }
  */
 function requireAuth(req, res, next) {
   const header = req.headers.authorization;
@@ -32,4 +34,19 @@ function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { requireAuth };
+/**
+ * Дополнительно проверяет имя роли из JWT (например requireRole("admin"))
+ */
+function requireRole(...allowedNames) {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Требуется авторизация" });
+    }
+    if (!allowedNames.includes(req.user.role)) {
+      return res.status(403).json({ error: "Недостаточно прав" });
+    }
+    next();
+  };
+}
+
+module.exports = { requireAuth, requireRole };

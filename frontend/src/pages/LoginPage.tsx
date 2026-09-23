@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiPath } from "../lib/api";
 import { TOKEN_KEY, USER_KEY } from "../lib/authStorage";
+import "../styles/pages/auth.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export function LoginPage() {
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
       navigate("/");
     } catch {
-      setError("Нет связи с сервером. Запустите backend: cd prototype/backend && npm run dev");
+      setError("Нет связи с сервером. Запущен ли backend?");
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,7 @@ export function LoginPage() {
             <span className="brand-name">ВетКлиника Online</span>
           </Link>
           <Link className="nav-link" to="/register">
-            О демо-регистрации
+            Регистрация
           </Link>
         </div>
       </header>
@@ -61,10 +62,8 @@ export function LoginPage() {
       <main id="auth-main" className="auth-main">
         <div className="container">
           <div className="auth-card hero-panel">
-            <h1 className="auth-title">Вход (демо)</h1>
-            <p className="auth-lead">
-              Тестовый аккаунт прототипа: <strong>demo@vet.local</strong> / <strong>demo123</strong>
-            </p>
+            <h1 className="auth-title">Вход</h1>
+            <p className="auth-lead">Войдите по email и паролю.</p>
             <form className="form" onSubmit={onSubmit}>
               {error ? (
                 <p className="auth-error" role="alert">
@@ -90,7 +89,7 @@ export function LoginPage() {
               </button>
             </form>
             <p className="auth-switch">
-              <Link to="/">На главную</Link>
+              Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
             </p>
           </div>
         </div>

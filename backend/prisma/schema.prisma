@@ -1,0 +1,142 @@
+// npx prisma migrate dev   — создать/применить миграции
+// npx prisma generate      — обновить клиент после смены схемы
+// npx prisma studio        — просмотр данных в браузере
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Роли пользователей (клиент, врач, администратор и т.д.)
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(50)
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  roleId       Int      @map("role_id")
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  fullName     String   @map("full_name") @db.VarChar(200)
+  phone        String?  @db.VarChar(40)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  role         Role           @relation(fields: [roleId], references: [id])
+  pets         Pet[]
+  veterinarian Veterinarian?
+
+  @@index([roleId])
+  @@map("users")
+}
+
+/// Питомец принадлежит клиенту (User с ролью client)
+model Pet {
+  id        Int       @id @default(autoincrement())
+  ownerId   Int       @map("owner_id")
+  name      String    @db.VarChar(100)
+  species   String    @db.VarChar(80)
+  breed     String?   @db.VarChar(120)
+  birthDate DateTime? @map("birth_date") @db.Date
+  notes     String?   @db.Text
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  vaccinations   Vaccination[]
+
+  @@index([ownerId])
+  @@map("pets")
+}
+
+model Service {
+  id              Int     @id @default(autoincrement())
+  name            String  @db.VarChar(150)
+  description     String? @db.Text
+  durationMinutes Int     @map("duration_minutes")
+  price           Decimal @db.Decimal(10, 2)
+
+  appointments Appointment[]
+
+  @@map("services")
+}
+
+/// Профиль врача связан 1:1 с пользователем с соответствующей ролью
+model Veterinarian {
+  id             Int     @id @default(autoincrement())
+  userId         Int     @unique @map("user_id")
+  specialization String  @db.VarChar(200)
+  licenseNumber  String? @map("license_number") @db.VarChar(80)
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  vaccinations   Vaccination[]
+
+  @@map("veterinarians")
+}
+
+model Appointment {
+  id             Int      @id @default(autoincrement())
+  petId          Int      @map("pet_id")
+  veterinarianId Int      @map("veterinarian_id")
+  serviceId      Int      @map("service_id")
+  scheduledAt    DateTime @map("scheduled_at")
+  status         String   @db.VarChar(40)
+  clientNotes    String?  @map("client_notes") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  pet           Pet            @relation(fields: [petId], references: [id], onDelete: Cascade)
+  veterinarian  Veterinarian   @relation(fields: [veterinarianId], references: [id])
+  service       Service        @relation(fields: [serviceId], references: [id])
+  medicalRecord MedicalRecord?
+
+  @@index([petId])
+  @@index([veterinarianId])
+  @@index([scheduledAt])
+  @@map("appointments")
+}
+
+/// Запись в медкарте; опционально привязана к завершённому приёму
+model MedicalRecord {
+  id             Int      @id @default(autoincrement())
+  petId          Int      @map("pet_id")
+  veterinarianId Int      @map("veterinarian_id")
+  appointmentId  Int?     @unique @map("appointment_id")
+  diagnosis      String?  @db.Text
+  treatmentNotes String?  @map("treatment_notes") @db.Text
+  /// Фактическая дата/время приёма (указывает врач или админ)
+  visitedAt      DateTime? @map("visited_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  pet           Pet          @relation(fields: [petId], references: [id], onDelete: Cascade)
+  veterinarian  Veterinarian @relation(fields: [veterinarianId], references: [id])
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([petId])
+  @@map("medical_records")
+}
+
+model Vaccination {
+  id             Int       @id @default(autoincrement())
+  petId          Int       @map("pet_id")
+  veterinarianId Int?      @map("veterinarian_id")
+  vaccineName    String    @map("vaccine_name") @db.VarChar(150)
+  administeredAt DateTime  @map("administered_at") @db.Date
+  nextDueDate    DateTime? @map("next_due_date") @db.Date
+  batchNumber    String?   @map("batch_number") @db.VarChar(80)
+
+  pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  veterinarian  Veterinarian? @relation(fields: [veterinarianId], references: [id], onDelete: SetNull)
+
+  @@index([petId])
+  @@map("vaccinations")
+}

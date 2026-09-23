@@ -1,0 +1,156 @@
+/* Contacts page styles */
+/* Метки в карточках контактов — мелкий капс, читабельнее без серифа */
+.contact-card .card-title {
+  font-family: var(--font-body);
+}
+
+.contact-card {
+  border: 1px solid var(--border-subtle);
+  background: var(--card-surface);
+  border-radius: var(--radius);
+  padding: 18px 20px 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+  outline: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.contact-card:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+.contact-card .card-title {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+.contact-card .card-text {
+  margin: 0;
+  color: var(--text);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.contacts-page {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.4fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.contacts-info {
+  display: grid;
+  gap: 12px;
+}
+
+.contacts-quick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.contacts-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.contacts-hours {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.contacts-hours li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(210, 220, 245, 0.1);
+  background: rgba(8, 16, 29, 0.36);
+}
+
+.contacts-hours span {
+  color: var(--text-soft);
+}
+
+.contacts-hours strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.contacts-map-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--card-surface);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+  padding: 14px;
+}
+
+.contacts-map-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.contacts-map-head .section-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.contacts-map-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.contacts-map-wrap {
+  flex: 1;
+  border: 1px solid rgba(210, 220, 245, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 420px;
+}
+
+.contacts-map {
+  width: 100%;
+  min-height: 420px;
+  border: 0;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .contacts-page {
+    grid-template-columns: 1fr;
+  }
+
+  .contacts-quick {
+    grid-template-columns: 1fr;
+  }
+
+  .contacts-map-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .contacts-map-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .contacts-map-wrap,
+  .contacts-map {
+    min-height: 260px;
+  }
+}

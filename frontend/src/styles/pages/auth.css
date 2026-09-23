@@ -1,0 +1,54 @@
+/* Login/Register page styles */
+
+.auth-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 0 48px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.auth-title {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+}
+
+.auth-lead {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 233, 233, 0.9);
+  border: 1px solid rgba(198, 78, 78, 0.45);
+  color: #7b1f1f;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.auth-switch {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth-switch a {
+  color: var(--primary-2);
+  font-weight: 600;
+}

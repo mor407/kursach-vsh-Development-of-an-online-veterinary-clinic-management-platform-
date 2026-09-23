@@ -55,6 +55,7 @@ export function MainLayout() {
               </p>
               <span className="muted">© {year} ВетКлиника Online</span>
             </div>
+
             <div className="footer-links">
               <div className="footer-col">
                 <div className="footer-col-title">Разделы</div>

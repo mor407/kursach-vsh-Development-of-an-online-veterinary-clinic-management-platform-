@@ -1,0 +1,46 @@
+/* Reports page styles */
+.reports-print-area {
+  margin-top: 8px;
+}
+
+.reports-pdf-header {
+  margin-bottom: 12px;
+}
+
+.reports-pdf-title {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.reports-pdf-period {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.reports-stats {
+  margin: 16px 0 20px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--card-surface);
+}
+
+.reports-stat-main {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.reports-stat-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.appt-table th,
+.appt-table td {
+  vertical-align: top;
+}

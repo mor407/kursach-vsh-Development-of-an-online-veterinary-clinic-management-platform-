@@ -1,0 +1,181 @@
+/* Doctor dashboard page styles */
+.appt-table-wrap {
+  margin-top: 24px;
+}
+
+.appt-table th,
+.appt-table td {
+  vertical-align: top;
+}
+
+.appt-row-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  max-width: 260px;
+}
+
+.appt-actions {
+  min-width: 140px;
+}
+
+.appt-status-select-wrap .select-input {
+  font-size: 13px;
+  padding: 8px 10px;
+}
+
+.doctor-dash-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.doctor-profile-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(120, 88, 53, 0.14);
+  border-radius: 12px;
+  background:
+    radial-gradient(420px 130px at 0% 0%, rgba(235, 138, 47, 0.08), transparent 60%),
+    rgba(255, 252, 247, 0.78);
+}
+
+.doctor-profile-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #7a4310;
+  background: rgba(235, 138, 47, 0.16);
+  border: 1px solid rgba(235, 138, 47, 0.3);
+  flex: 0 0 auto;
+}
+
+.doctor-profile-main {
+  min-width: 0;
+}
+
+.doctor-profile-kicker {
+  margin: 0 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.doctor-profile-name {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.doctor-profile-role {
+  margin: 3px 0 6px;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.doctor-profile-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.doctor-profile-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 88, 53, 0.16);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.doctor-dash-stat-card {
+  border: 1px solid rgba(120, 88, 53, 0.14);
+  background: rgba(255, 252, 247, 0.74);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.doctor-dash-stat-label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.doctor-dash-stat-value {
+  font-size: 1.2rem;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.doctor-dash-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 14px;
+}
+
+.doctor-dash-controls .services-field {
+  flex: 1 1 260px;
+}
+
+.doctor-dash-controls .services-field--narrow {
+  flex: 0 0 210px;
+}
+
+.doctor-dash-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.doctor-dash-chip {
+  appearance: none;
+  border: 1px solid rgba(120, 88, 53, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.78);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.doctor-dash-chip:hover {
+  border-color: rgba(100, 130, 190, 0.35);
+}
+
+.doctor-dash-chip.is-active {
+  border-color: rgba(235, 138, 47, 0.45);
+  background: rgba(255, 244, 228, 0.88);
+  color: var(--text);
+}
+
+.doctor-dash-section .services-table th:last-child,
+.doctor-dash-section .services-table td:last-child {
+  min-width: 160px;
+}
+
+.doctor-dash-section {
+  margin-bottom: 32px;
+}
+
+.doctor-dash-heading {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}

@@ -1,21 +1,36 @@
 const express = require("express");
+const { prisma } = require("../db/prisma");
 const { requireAuth } = require("../middleware/requireAuth");
-const { DEMO_USER } = require("../data/demo");
 
 const router = express.Router();
 
-router.get("/me", requireAuth, (req, res) => {
-  if (req.user.id !== DEMO_USER.id) {
-    return res.status(404).json({ error: "Пользователь не найден" });
+router.get("/me", requireAuth, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        phone: true,
+        role: { select: { id: true, name: true } },
+        veterinarian: {
+          select: {
+            id: true,
+            specialization: true,
+            licenseNumber: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      return res.status(404).json({ error: "Пользователь не найден" });
+    }
+    res.json(user);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Ошибка сервера" });
   }
-
-  res.json({
-    id: DEMO_USER.id,
-    email: DEMO_USER.email,
-    fullName: DEMO_USER.fullName,
-    phone: DEMO_USER.phone,
-    role: { id: DEMO_USER.role.id, name: DEMO_USER.role.name },
-  });
 });
 
 module.exports = router;
