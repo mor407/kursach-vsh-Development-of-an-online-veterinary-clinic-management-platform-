@@ -7,6 +7,17 @@ const SALT_ROUNDS = 10;
 /** Пароль для демо-аккаунтов seed (см. .env.example). Меняйте на своей машине при необходимости. */
 const DEMO_PASSWORD = "demo123";
 
+/** Служебные маркеры сида (не должны попадать в UI). */
+const SEED_MARKER_RE =
+  /\s*(?:DEMO_SEED_APPOINTMENT|EXT_APPT|DEMO_SEED_MEDICAL|EXT_MED)(?::[\w-]+)?\s*/g;
+
+/** Убирает маркеры сида из пользовательского текста. */
+function stripSeedMarkers(text) {
+  if (text == null) return null;
+  const cleaned = String(text).replace(SEED_MARKER_RE, " ").replace(/\s+/g, " ").trim();
+  return cleaned.length > 0 ? cleaned : null;
+}
+
 /** Демо-услуги: при каждом `npm run db:seed` добавляются только отсутствующие (по точному названию). */
 const demoServices = [
   {
@@ -261,7 +272,7 @@ const extendedAppointments = [
     hour: 11,
     minute: 30,
     status: "confirmed",
-    clientNotes: "Снижен аппетит 2 дня. EXT_APPT:luna-primary-future",
+    clientNotes: "Снижен аппетит 2 дня.",
   },
   {
     marker: "EXT_APPT:richi-nutrition-future",
@@ -273,7 +284,7 @@ const extendedAppointments = [
     hour: 16,
     minute: 0,
     status: "pending",
-    clientNotes: "Подобрать рацион для снижения веса. EXT_APPT:richi-nutrition-future",
+    clientNotes: "Подобрать рацион для снижения веса.",
   },
   {
     marker: "EXT_APPT:grey-ekg-past",
@@ -285,7 +296,7 @@ const extendedAppointments = [
     hour: 13,
     minute: 15,
     status: "completed",
-    clientNotes: "Периодическая одышка после нагрузки. EXT_APPT:grey-ekg-past",
+    clientNotes: "Периодическая одышка после нагрузки.",
   },
   {
     marker: "EXT_APPT:plusha-primary-cancelled",
@@ -297,7 +308,7 @@ const extendedAppointments = [
     hour: 9,
     minute: 45,
     status: "cancelled",
-    clientNotes: "Перенос из-за поездки. EXT_APPT:plusha-primary-cancelled",
+    clientNotes: "Перенос из-за поездки.",
   },
   {
     marker: "EXT_APPT:tomas-derma-past",
@@ -309,7 +320,7 @@ const extendedAppointments = [
     hour: 10,
     minute: 0,
     status: "completed",
-    clientNotes: "Шелушение кожи в области шеи. EXT_APPT:tomas-derma-past",
+    clientNotes: "Шелушение кожи в области шеи.",
   },
   {
     marker: "EXT_APPT:nika-dental-future",
@@ -321,7 +332,7 @@ const extendedAppointments = [
     hour: 12,
     minute: 30,
     status: "confirmed",
-    clientNotes: "Плановая чистка по рекомендации врача. EXT_APPT:nika-dental-future",
+    clientNotes: "Плановая чистка по рекомендации врача.",
   },
 ];
 
@@ -335,7 +346,7 @@ const extendedMedicalRecords = [
     appointmentMarker: "EXT_APPT:grey-ekg-past",
     diagnosis: "Синусовая тахикардия при стресс-тесте, без признаков острой декомпенсации.",
     treatmentNotes:
-      "Ограничить интенсивные нагрузки 10 дней, контрольное ЭКГ через 1 месяц. EXT_MED:grey-ekg",
+      "Ограничить интенсивные нагрузки 10 дней, контрольное ЭКГ через 1 месяц.",
   },
   {
     slug: "tomas-derma",
@@ -345,9 +356,138 @@ const extendedMedicalRecords = [
     appointmentMarker: "EXT_APPT:tomas-derma-past",
     diagnosis: "Контактный дерматит лёгкой степени, без признаков вторичной инфекции.",
     treatmentNotes:
-      "Местная обработка 2 раза в день 7 суток, сменить шампунь на гипоаллергенный. EXT_MED:tomas-derma",
+      "Местная обработка 2 раза в день 7 суток, сменить шампунь на гипоаллергенный.",
   },
 ];
+
+/** Базовые демо-приёмы (client@vetdemo.local). marker — только для поиска старых строк в БД. */
+const demoPastAppointments = [
+  {
+    marker: "DEMO_SEED_APPOINTMENT:barsik-primary",
+    petName: "Барсик",
+    serviceName: "Первичный осмотр",
+    daysFromNow: -21,
+    hour: 11,
+    status: "completed",
+    clientNotes: "Демо: первичный приём.",
+  },
+  {
+    marker: "DEMO_SEED_APPOINTMENT:rex-derma",
+    petName: "Рекс",
+    serviceName: "Консультация дерматолога",
+    daysFromNow: -10,
+    hour: 14,
+    status: "completed",
+    clientNotes: "Чешется, есть подозрение на пищевую аллергию.",
+  },
+  {
+    marker: "DEMO_SEED_APPOINTMENT:murka-uzi",
+    petName: "Мурка",
+    serviceName: "УЗИ брюшной полости",
+    daysFromNow: -5,
+    hour: 9,
+    status: "completed",
+    clientNotes: "Профилактика, жалоб нет.",
+  },
+  {
+    marker: "DEMO_SEED_APPOINTMENT:barsik-vacc",
+    petName: "Барсик",
+    serviceName: "Вакцинация комплексная",
+    daysFromNow: -60,
+    hour: 10,
+    status: "completed",
+    clientNotes: "Плановая вакцинация.",
+  },
+];
+
+const FUTURE_APPT_MARKER = "DEMO_SEED_APPOINTMENT:future";
+const FUTURE_APPT_NOTES = "Запись из сида.";
+
+/** Все демо-приёмы с marker → чистый clientNotes (для поиска после очистки). */
+function allAppointmentSeedNotes() {
+  return [
+    { marker: FUTURE_APPT_MARKER, clientNotes: FUTURE_APPT_NOTES },
+    ...demoPastAppointments.map((s) => ({ marker: s.marker, clientNotes: s.clientNotes })),
+    ...extendedAppointments.map((s) => ({ marker: s.marker, clientNotes: s.clientNotes })),
+  ];
+}
+
+/** Находит приём по старому маркеру в notes или по уже очищенному тексту. */
+async function findAppointmentBySeedMarker(marker) {
+  const byMarker = await prisma.appointment.findFirst({
+    where: { clientNotes: { contains: marker } },
+  });
+  if (byMarker) return byMarker;
+
+  const meta = allAppointmentSeedNotes().find((s) => s.marker === marker);
+  if (!meta) return null;
+  const clean = stripSeedMarkers(meta.clientNotes) ?? meta.clientNotes;
+  return prisma.appointment.findFirst({
+    where: { clientNotes: clean },
+  });
+}
+
+/** Если в notes ещё есть маркер — перезаписывает чистым текстом. */
+async function syncAppointmentCleanNotes(row, cleanNotes) {
+  if (!row) return row;
+  const next = stripSeedMarkers(cleanNotes) ?? cleanNotes;
+  if ((row.clientNotes ?? null) === (next ?? null)) return row;
+  return prisma.appointment.update({
+    where: { id: row.id },
+    data: { clientNotes: next },
+  });
+}
+
+async function scrubSeedMarkersFromDatabase() {
+  let apptCleaned = 0;
+  let medCleaned = 0;
+
+  const appts = await prisma.appointment.findMany({
+    where: {
+      OR: [
+        { clientNotes: { contains: "DEMO_SEED" } },
+        { clientNotes: { contains: "EXT_APPT" } },
+      ],
+    },
+  });
+  for (const a of appts) {
+    const cleaned = stripSeedMarkers(a.clientNotes);
+    if (cleaned !== a.clientNotes) {
+      await prisma.appointment.update({
+        where: { id: a.id },
+        data: { clientNotes: cleaned },
+      });
+      apptCleaned += 1;
+    }
+  }
+
+  const records = await prisma.medicalRecord.findMany({
+    where: {
+      OR: [
+        { treatmentNotes: { contains: "DEMO_SEED" } },
+        { treatmentNotes: { contains: "EXT_MED" } },
+        { diagnosis: { contains: "DEMO_SEED" } },
+      ],
+    },
+  });
+  for (const r of records) {
+    const diagnosis = stripSeedMarkers(r.diagnosis);
+    const treatmentNotes = stripSeedMarkers(r.treatmentNotes);
+    if (diagnosis !== r.diagnosis || treatmentNotes !== r.treatmentNotes) {
+      await prisma.medicalRecord.update({
+        where: { id: r.id },
+        data: { diagnosis, treatmentNotes },
+      });
+      medCleaned += 1;
+    }
+  }
+
+  if (apptCleaned > 0 || medCleaned > 0) {
+    console.log(
+      `Seed: очищены маркеры в текстах — приёмы: ${apptCleaned}, медкарты: ${medCleaned}`,
+    );
+  }
+}
 
 async function ensureDemoUsersAndPets() {
   const hash = await bcrypt.hash(DEMO_PASSWORD, SALT_ROUNDS);
@@ -440,10 +580,11 @@ async function ensureDemoUsersAndPets() {
 
 /** @param {DemoApptSeed} seed */
 async function ensureOneDemoAppointment(seed) {
-  const has = await prisma.appointment.findFirst({
-    where: { clientNotes: { contains: seed.marker } },
-  });
-  if (has) return has;
+  const cleanNotes = stripSeedMarkers(seed.clientNotes) ?? seed.clientNotes;
+  let has = await findAppointmentBySeedMarker(seed.marker);
+  if (has) {
+    return syncAppointmentCleanNotes(has, cleanNotes);
+  }
 
   const vet =
     (await prisma.veterinarian.findFirst({
@@ -469,7 +610,7 @@ async function ensureOneDemoAppointment(seed) {
       serviceId: service.id,
       scheduledAt,
       status: seed.status,
-      clientNotes: seed.clientNotes,
+      clientNotes: cleanNotes,
     },
   });
 }
@@ -486,83 +627,47 @@ async function ensureDemoAppointments() {
     })) ?? (await prisma.veterinarian.findFirst());
   if (!petFirst || !vet) return;
 
-  const hasFutureNew = await prisma.appointment.findFirst({
-    where: { clientNotes: { contains: "DEMO_SEED_APPOINTMENT:future" } },
-  });
-  const hasFutureLegacy = await prisma.appointment.findFirst({
-    where: {
-      OR: [
-        { clientNotes: { contains: "ДEMO_SEED_APPOINTMENT" } },
-        {
-          AND: [
-            { clientNotes: { contains: "DEMO_SEED_APPOINTMENT" } },
-            { NOT: { clientNotes: { contains: "DEMO_SEED_APPOINTMENT:" } } },
-          ],
-        },
-      ],
-    },
-  });
-  if (!hasFutureNew && !hasFutureLegacy) {
-    const scheduledAt = new Date();
-    scheduledAt.setDate(scheduledAt.getDate() + 3);
-    scheduledAt.setHours(10, 0, 0, 0);
-    await prisma.appointment.create({
-      data: {
-        petId: petFirst.id,
-        veterinarianId: vet.id,
-        serviceId: serviceFirst.id,
-        scheduledAt,
-        status: "confirmed",
-        clientNotes: "Запись из сида. DEMO_SEED_APPOINTMENT:future",
+  let future = await findAppointmentBySeedMarker(FUTURE_APPT_MARKER);
+  if (future) {
+    await syncAppointmentCleanNotes(future, FUTURE_APPT_NOTES);
+  } else {
+    const hasFutureLegacy = await prisma.appointment.findFirst({
+      where: {
+        OR: [
+          { clientNotes: { contains: "ДEMO_SEED_APPOINTMENT" } },
+          {
+            AND: [
+              { clientNotes: { contains: "DEMO_SEED_APPOINTMENT" } },
+              { NOT: { clientNotes: { contains: "DEMO_SEED_APPOINTMENT:" } } },
+            ],
+          },
+          { clientNotes: FUTURE_APPT_NOTES },
+        ],
       },
     });
-    console.log("Seed: добавлена демо-запись на приём (через 3 дня)");
+    if (hasFutureLegacy) {
+      await syncAppointmentCleanNotes(hasFutureLegacy, FUTURE_APPT_NOTES);
+    } else {
+      const scheduledAt = new Date();
+      scheduledAt.setDate(scheduledAt.getDate() + 3);
+      scheduledAt.setHours(10, 0, 0, 0);
+      await prisma.appointment.create({
+        data: {
+          petId: petFirst.id,
+          veterinarianId: vet.id,
+          serviceId: serviceFirst.id,
+          scheduledAt,
+          status: "confirmed",
+          clientNotes: FUTURE_APPT_NOTES,
+        },
+      });
+      console.log("Seed: добавлена демо-запись на приём (через 3 дня)");
+    }
   }
 
-  const pastAppts = [
-    {
-      marker: "DEMO_SEED_APPOINTMENT:barsik-primary",
-      petName: "Барсик",
-      serviceName: "Первичный осмотр",
-      daysFromNow: -21,
-      hour: 11,
-      status: "completed",
-      clientNotes: "Демо: первичный приём. DEMO_SEED_APPOINTMENT:barsik-primary",
-    },
-    {
-      marker: "DEMO_SEED_APPOINTMENT:rex-derma",
-      petName: "Рекс",
-      serviceName: "Консультация дерматолога",
-      daysFromNow: -10,
-      hour: 14,
-      status: "completed",
-      clientNotes: "Чешется, есть подозрение на пищевую аллергию. DEMO_SEED_APPOINTMENT:rex-derma",
-    },
-    {
-      marker: "DEMO_SEED_APPOINTMENT:murka-uzi",
-      petName: "Мурка",
-      serviceName: "УЗИ брюшной полости",
-      daysFromNow: -5,
-      hour: 9,
-      status: "completed",
-      clientNotes: "Профилактика, жалоб нет. DEMO_SEED_APPOINTMENT:murka-uzi",
-    },
-    {
-      marker: "DEMO_SEED_APPOINTMENT:barsik-vacc",
-      petName: "Барсик",
-      serviceName: "Вакцинация комплексная",
-      daysFromNow: -60,
-      hour: 10,
-      status: "completed",
-      clientNotes: "Плановая вакцинация. DEMO_SEED_APPOINTMENT:barsik-vacc",
-    },
-  ];
-
   let apptAdded = 0;
-  for (const s of pastAppts) {
-    const before = await prisma.appointment.findFirst({
-      where: { clientNotes: { contains: s.marker } },
-    });
+  for (const s of demoPastAppointments) {
+    const before = await findAppointmentBySeedMarker(s.marker);
     const row = await ensureOneDemoAppointment(s);
     if (row && !before) apptAdded += 1;
   }
@@ -572,15 +677,34 @@ async function ensureDemoAppointments() {
 }
 
 /**
- * @param {string} slug уникальный суффикс после DEMO_SEED_MEDICAL:
+ * @param {string} slug уникальный суффикс после DEMO_SEED_MEDICAL (только для поиска старых строк)
  * @param {{ petName: string, diagnosis: string, treatmentNotes: string, appointmentMarker?: string }} body
  */
 async function ensureDemoMedicalRecord(slug, body) {
   const tag = `DEMO_SEED_MEDICAL:${slug}`;
-  const exists = await prisma.medicalRecord.findFirst({
-    where: { treatmentNotes: { contains: tag } },
+  const cleanTreatment = stripSeedMarkers(body.treatmentNotes) ?? body.treatmentNotes;
+  const cleanDiagnosis = stripSeedMarkers(body.diagnosis) ?? body.diagnosis;
+
+  let exists = await prisma.medicalRecord.findFirst({
+    where: {
+      OR: [
+        { treatmentNotes: { contains: tag } },
+        { treatmentNotes: cleanTreatment },
+      ],
+    },
   });
-  if (exists) return;
+  if (exists) {
+    if (
+      exists.treatmentNotes !== cleanTreatment ||
+      exists.diagnosis !== cleanDiagnosis
+    ) {
+      await prisma.medicalRecord.update({
+        where: { id: exists.id },
+        data: { treatmentNotes: cleanTreatment, diagnosis: cleanDiagnosis },
+      });
+    }
+    return;
+  }
 
   const vet = await prisma.veterinarian.findFirst({
     where: { user: { email: "doctor@vetdemo.local" } },
@@ -591,9 +715,7 @@ async function ensureDemoMedicalRecord(slug, body) {
 
   let appointmentId = null;
   if (body.appointmentMarker) {
-    const ap = await prisma.appointment.findFirst({
-      where: { clientNotes: { contains: body.appointmentMarker } },
-    });
+    const ap = await findAppointmentBySeedMarker(body.appointmentMarker);
     if (ap) {
       const taken = await prisma.medicalRecord.findUnique({
         where: { appointmentId: ap.id },
@@ -612,18 +734,26 @@ async function ensureDemoMedicalRecord(slug, body) {
       petId: pet.id,
       veterinarianId: vetFallback.id,
       appointmentId,
-      diagnosis: body.diagnosis,
-      treatmentNotes: `${body.treatmentNotes}\n${tag}`,
+      diagnosis: cleanDiagnosis,
+      treatmentNotes: cleanTreatment,
     },
   });
 }
 
 async function ensureDemoMedicalRecords() {
   const legacyTag = "DEMO_SEED_MEDICAL";
+  const legacyDiagnosisClean = "Плановый осмотр: состояние удовлетворительное.";
   const hasLegacy = await prisma.medicalRecord.findFirst({
     where: {
-      diagnosis: { contains: legacyTag },
-      NOT: { diagnosis: { contains: `${legacyTag}:` } },
+      OR: [
+        {
+          AND: [
+            { diagnosis: { contains: legacyTag } },
+            { NOT: { diagnosis: { contains: `${legacyTag}:` } } },
+          ],
+        },
+        { diagnosis: legacyDiagnosisClean },
+      ],
     },
   });
 
@@ -632,14 +762,22 @@ async function ensureDemoMedicalRecords() {
   });
   const vetFallback = vet ?? (await prisma.veterinarian.findFirst());
   const client = await prisma.user.findUnique({ where: { email: "client@vetdemo.local" } });
-  if (!hasLegacy && vetFallback && client) {
+  if (hasLegacy) {
+    const cleanedDiag = stripSeedMarkers(hasLegacy.diagnosis) ?? legacyDiagnosisClean;
+    if (hasLegacy.diagnosis !== cleanedDiag) {
+      await prisma.medicalRecord.update({
+        where: { id: hasLegacy.id },
+        data: { diagnosis: cleanedDiag },
+      });
+    }
+  } else if (vetFallback && client) {
     const pet = await prisma.pet.findFirst({ where: { ownerId: client.id } });
     if (pet) {
       await prisma.medicalRecord.create({
         data: {
           petId: pet.id,
           veterinarianId: vetFallback.id,
-          diagnosis: `Плановый осмотр: состояние удовлетворительное. ${legacyTag}`,
+          diagnosis: legacyDiagnosisClean,
           treatmentNotes: "Рекомендован контроль через 2 недели при изменении поведения.",
         },
       });
@@ -698,7 +836,12 @@ async function ensureDemoMedicalRecords() {
   let added = 0;
   for (const s of seeds) {
     const before = await prisma.medicalRecord.findFirst({
-      where: { treatmentNotes: { contains: `DEMO_SEED_MEDICAL:${s.slug}` } },
+      where: {
+        OR: [
+          { treatmentNotes: { contains: `DEMO_SEED_MEDICAL:${s.slug}` } },
+          { treatmentNotes: s.treatmentNotes },
+        ],
+      },
     });
     await ensureDemoMedicalRecord(s.slug, s);
     if (!before) added += 1;
@@ -787,11 +930,16 @@ async function ensureExtendedUsersAndPets() {
 
 async function ensureExtendedAppointments() {
   let created = 0;
+  let cleaned = 0;
   for (const seed of extendedAppointments) {
-    const has = await prisma.appointment.findFirst({
-      where: { clientNotes: { contains: seed.marker } },
-    });
-    if (has) continue;
+    const cleanNotes = stripSeedMarkers(seed.clientNotes) ?? seed.clientNotes;
+    let has = await findAppointmentBySeedMarker(seed.marker);
+    if (has) {
+      const before = has.clientNotes;
+      has = await syncAppointmentCleanNotes(has, cleanNotes);
+      if (before !== has.clientNotes) cleaned += 1;
+      continue;
+    }
 
     const [owner, vetUser, service] = await Promise.all([
       prisma.user.findUnique({ where: { email: seed.ownerEmail } }),
@@ -817,7 +965,7 @@ async function ensureExtendedAppointments() {
         serviceId: service.id,
         scheduledAt,
         status: seed.status,
-        clientNotes: seed.clientNotes,
+        clientNotes: cleanNotes,
       },
     });
     created += 1;
@@ -825,16 +973,40 @@ async function ensureExtendedAppointments() {
   if (created > 0) {
     console.log(`Seed: добавлены расширенные приёмы: ${created}`);
   }
+  if (cleaned > 0) {
+    console.log(`Seed: очищены комментарии расширенных приёмов: ${cleaned}`);
+  }
 }
 
 async function ensureExtendedMedicalRecords() {
   let created = 0;
+  let cleaned = 0;
   for (const row of extendedMedicalRecords) {
     const tag = `EXT_MED:${row.slug}`;
-    const exists = await prisma.medicalRecord.findFirst({
-      where: { treatmentNotes: { contains: tag } },
+    const cleanTreatment = stripSeedMarkers(row.treatmentNotes) ?? row.treatmentNotes;
+    const cleanDiagnosis = stripSeedMarkers(row.diagnosis) ?? row.diagnosis;
+
+    let exists = await prisma.medicalRecord.findFirst({
+      where: {
+        OR: [
+          { treatmentNotes: { contains: tag } },
+          { treatmentNotes: cleanTreatment },
+        ],
+      },
     });
-    if (exists) continue;
+    if (exists) {
+      if (
+        exists.treatmentNotes !== cleanTreatment ||
+        exists.diagnosis !== cleanDiagnosis
+      ) {
+        await prisma.medicalRecord.update({
+          where: { id: exists.id },
+          data: { treatmentNotes: cleanTreatment, diagnosis: cleanDiagnosis },
+        });
+        cleaned += 1;
+      }
+      continue;
+    }
 
     const [owner, vetUser] = await Promise.all([
       prisma.user.findUnique({ where: { email: row.ownerEmail } }),
@@ -850,9 +1022,7 @@ async function ensureExtendedMedicalRecords() {
 
     let appointmentId = null;
     if (row.appointmentMarker) {
-      const appt = await prisma.appointment.findFirst({
-        where: { clientNotes: { contains: row.appointmentMarker } },
-      });
+      const appt = await findAppointmentBySeedMarker(row.appointmentMarker);
       if (appt) {
         const taken = await prisma.medicalRecord.findUnique({ where: { appointmentId: appt.id } });
         if (!taken) appointmentId = appt.id;
@@ -864,14 +1034,17 @@ async function ensureExtendedMedicalRecords() {
         petId: pet.id,
         veterinarianId: vet.id,
         appointmentId,
-        diagnosis: row.diagnosis,
-        treatmentNotes: `${row.treatmentNotes}\n${tag}`,
+        diagnosis: cleanDiagnosis,
+        treatmentNotes: cleanTreatment,
       },
     });
     created += 1;
   }
   if (created > 0) {
     console.log(`Seed: добавлены расширенные медкарты: ${created}`);
+  }
+  if (cleaned > 0) {
+    console.log(`Seed: очищены тексты расширенных медкарт: ${cleaned}`);
   }
 }
 
@@ -907,6 +1080,7 @@ async function main() {
   await ensureExtendedUsersAndPets();
   await ensureExtendedAppointments();
   await ensureExtendedMedicalRecords();
+  await scrubSeedMarkersFromDatabase();
 }
 
 main()

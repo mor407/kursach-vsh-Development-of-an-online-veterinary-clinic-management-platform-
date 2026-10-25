@@ -16,8 +16,8 @@
     "seed": "node prisma/seed.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Maxim G.S.",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "@prisma/client": "^5.22.0",
